@@ -3,14 +3,14 @@ import React from "react";
 function Brokerage() {
   return (
     <div className="container">
-      <div className="row p-5 mt-5 text-center border-top">
-        <div className="col-8 p-4">
-          <a href="" style={{ textDecoration: "none" }}>
-            <h3 className="fs-5">Brokerage calculator</h3>
+      <div className="row p-3 p-md-5 mt-3 mt-md-5 text-center border-top">
+        <div className="col-12 col-lg-8 p-3 p-md-4 mb-4 mb-lg-0">
+          <a href="#" style={{ textDecoration: "none" }}>
+            <h3 className="fs-6 fs-md-5">Brokerage calculator</h3>
           </a>
           <ul
             style={{ textAlign: "left", lineHeight: "2.5", fontSize: "12px" }}
-            className="text-mut"
+            className="text-muted mt-3"
           >
             <li>
               Call & Trade and RMS auto-squareoff:Additional charges of ₹50 +
@@ -35,9 +35,9 @@ function Brokerage() {
             </li>
           </ul>
         </div>
-        <div className="col-4 p-4">
-          <a href="" style={{ textDecoration: "none" }}>
-            <h3 className="fs-5">List of charges</h3>
+        <div className="col-12 col-lg-4 p-3 p-md-4">
+          <a href="#" style={{ textDecoration: "none" }}>
+            <h3 className="fs-6 fs-md-5">List of charges</h3>
           </a>
         </div>
       </div>

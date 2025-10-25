@@ -68,17 +68,20 @@ const cors = require("cors");
 const sessionItems = {
   secret: "zerodha application",
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
   },
 };
-app.use(session(sessionItems));
 
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true
+}));
 app.use(bodyParser.json());
+app.use(session(sessionItems));
 
 app.use(passport.initialize()); //for any request initialize the passort id
 app.use(passport.session()); //identify the users as the brows from page to page
@@ -88,23 +91,71 @@ passport.serializeUser(UserModel.serializeUser());
 passport.deserializeUser(UserModel.deserializeUser());
 
 app.post("/signup", async (req, res) => {
-  //console.log("backend data", req.body);
-
   try {
-    let { email, username, password } = req.body.formData;
+    let { email, username, password } = req.body;
     if (!username || !email || !password) {
-      return res.status(401).json({ message: "something went wrong" });
+      return res.status(400).json({ message: "All fields are required" });
     }
     let newUser = new UserModel({
       email: email,
       username: username,
     });
     let registeredUser = await UserModel.register(newUser, password);
-    //console.log(registeredUser);
-    return res.status(200).json({ message: "user registered" });
+    
+    req.login(registeredUser, (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Error logging in after signup" });
+      }
+      return res.status(200).json({ 
+        message: "User registered successfully",
+        user: {
+          id: registeredUser._id,
+          username: registeredUser.username,
+          email: registeredUser.email
+        }
+      });
+    });
   } catch (error) {
-    console.log(error);
+    console.error('[Signup Error]', error.message);
+    if (error.name === 'UserExistsError') {
+      return res.status(409).json({ message: "Username already exists" });
+    }
+    return res.status(500).json({ message: "Error registering user" });
   }
+});
+
+app.post("/login", passport.authenticate("local"), (req, res) => {
+  res.status(200).json({ 
+    message: "Logged in successfully",
+    user: {
+      id: req.user._id,
+      username: req.user.username,
+      email: req.user.email
+    }
+  });
+});
+
+app.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Error logging out" });
+    }
+    res.status(200).json({ message: "Logged out successfully" });
+  });
+});
+
+app.get("/checkAuth", (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.status(200).json({ 
+      authenticated: true,
+      user: {
+        id: req.user._id,
+        username: req.user.username,
+        email: req.user.email
+      }
+    });
+  }
+  res.status(401).json({ authenticated: false });
 });
 
 // app.get("/demo", async (req, res) => {

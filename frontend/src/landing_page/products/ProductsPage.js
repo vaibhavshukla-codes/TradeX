@@ -4,16 +4,18 @@ import Hero from "./Hero";
 import LeftSection from "./LeftSection";
 import RightSection from "./RightSection";
 import Universe from "./Universe";
+import kite from "../../TradeXAssets/kite.png";
+import console from "../../TradeXAssets/console.png";
+import coin from "../../TradeXAssets/coin.png";
+import kiteconnect from "../../TradeXAssets/kiteconnect.png";
+import varsity from "../../TradeXAssets/varsity.png";
 
-import Navbar from "../Navbar";
-import Footer from "../Footer";
-
-function PricingPage() {
+function ProductsPage() {
   return (
     <>
       <Hero />
       <LeftSection
-        imageURL="media/images/kite.png"
+        imageURL={kite}
         productName="Kite"
         productDesription="Our ultra-fast flagship trading platform with streaming market data, advanced charts, an elegant UI, and more. Enjoy the Kite experience seamlessly on your Android and iOS devices."
         tryDemo=""
@@ -22,13 +24,13 @@ function PricingPage() {
         appStore=""
       />
       <RightSection
-        imageURL="media/images/console.png"
+        imageURL={console}
         productName="Console"
         productDesription="The central dashboard for your Zerodha account. Gain insights into your trades and investments with in-depth reports and visualisations."
         learnMore=""
       />
       <LeftSection
-        imageURL="media/images/coin.png"
+        imageURL={coin}
         productName="Coin"
         productDesription="Buy direct mutual funds online, commission-free, delivered directly to your Demat account. Enjoy the investment experience on your Android and iOS devices."
         tryDemo=""
@@ -37,13 +39,13 @@ function PricingPage() {
         appStore=""
       />
       <RightSection
-        imageURL="media/images/kiteconnect.png"
+        imageURL={kiteconnect}
         productName="Kite Connect API"
         productDesription="Build powerful trading platforms and experiences with our super simple HTTP/JSON APIs. If you are a startup, build your investment app and showcase it to our clientbase."
         learnMore=""
       />
       <LeftSection
-        imageURL="media/images/varsity.png"
+        imageURL={varsity}
         productName="Varsity mobile"
         productDesription="An easy to grasp, collection of stock market lessons with in-depth coverage and illustrations. Content is broken down into bite-size cards to help you learn on the go."
         tryDemo=""
@@ -60,4 +62,4 @@ function PricingPage() {
   );
 }
 
-export default PricingPage;
+export default ProductsPage;

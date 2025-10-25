@@ -1,0 +1,245 @@
+/* Global Responsive Utilities for TradeX */
+
+/* Base Responsive Breakpoints:
+   - Mobile: < 576px
+   - Tablet: 576px - 768px
+   - Desktop: 768px - 992px
+   - Large Desktop: > 992px
+*/
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Container adjustments */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
+/* Text responsive sizes */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Button responsiveness */
+@media (max-width: 576px) {
+  .btn {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+  }
+  
+  .btn-lg {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* Table responsiveness */
+@media (max-width: 768px) {
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    font-size: 0.85rem;
+  }
+  
+  th, td {
+    padding: 8px 5px !important;
+    white-space: nowrap;
+  }
+}
+
+/* Utility classes */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .mobile-center {
+    text-align: center;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+  }
+}
+
+/* Padding adjustments */
+@media (max-width: 768px) {
+  .p-5 {
+    padding: 1.5rem !important;
+  }
+  
+  .p-4 {
+    padding: 1.25rem !important;
+  }
+  
+  .px-5 {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+  
+  .py-5 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+}
+
+/* Margin adjustments */
+@media (max-width: 768px) {
+  .m-5 {
+    margin: 1.5rem !important;
+  }
+  
+  .mt-5 {
+    margin-top: 1.5rem !important;
+  }
+  
+  .mb-5 {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+/* Flexbox responsive utilities */
+@media (max-width: 768px) {
+  .flex-mobile-column {
+    flex-direction: column !important;
+  }
+  
+  .flex-mobile-wrap {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Grid responsive */
+@media (max-width: 768px) {
+  .row {
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+  
+  .row > * {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Navigation responsive */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background-color: #fff;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+    margin-top: 0.5rem;
+  }
+  
+  .navbar-nav {
+    margin-left: 0 !important;
+  }
+  
+  .nav-item {
+    padding: 0.5rem 0;
+  }
+}
+
+/* Form responsiveness */
+@media (max-width: 576px) {
+  .form-control {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .form-label {
+    font-size: 0.9rem;
+  }
+}
+
+/* Modal responsiveness */
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modal-content {
+    border-radius: 0.25rem;
+  }
+}
+
+/* Overflow handling */
+@media (max-width: 768px) {
+  .overflow-scroll-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Hide/Show utilities */
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Aspect ratio for embedded content */
+.responsive-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+}
+
+.responsive-embed iframe,
+.responsive-embed object,
+.responsive-embed embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Touch-friendly targets */
+@media (max-width: 768px) {
+  a, button, .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+

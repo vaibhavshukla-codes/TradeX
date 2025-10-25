@@ -1,59 +1,44 @@
 import React from "react";
+import logo from "../TradeXAssets/logo.svg";
 
 function Footer() {
   return (
     <footer style={{ backgroundColor: "rgb(250, 250, 250)" }}>
       <div className="container border-top mt-5">
-        <div className="row mt-5">
-          <div className="col">
-            <img src="media/images/logo.svg" style={{ width: "50%" }} />
-            <p>
+        <div className="row mt-3 mt-md-5">
+          <div className="col-12 col-md-6 col-lg-3 mb-4">
+            <img src={logo} style={{ width: "150px", maxWidth: "100%" }} alt="TradeX Logo" />
+            <p className="mt-3">
               &copy; 2010 - 2024, Not Zerodha Broking Ltd. All rights reserved.
             </p>
           </div>
-          <div className="col">
-            <p>Company</p>
-            <a href="">About</a>
-            <br />
-            <a href="">Products</a>
-            <br />
-            <a href="">Pricing</a>
-            <br />
-            <a href="">Referral programme</a>
-            <br />
-            <a href="">Careers</a>
-            <br />
-            <a href="">Zerodha.tech</a>
-            <br />
-            <a href="">Press & media</a>
-            <br />
-            <a href="">Zerodha cares (CSR)</a>
-            <br />
+          <div className="col-6 col-md-6 col-lg-3 mb-4">
+            <p className="fw-bold">Company</p>
+            <a href="#" className="d-block mb-2">About</a>
+            <a href="#" className="d-block mb-2">Products</a>
+            <a href="#" className="d-block mb-2">Pricing</a>
+            <a href="#" className="d-block mb-2">Referral programme</a>
+            <a href="#" className="d-block mb-2">Careers</a>
+            <a href="#" className="d-block mb-2">Zerodha.tech</a>
+            <a href="#" className="d-block mb-2">Press & media</a>
+            <a href="#" className="d-block mb-2">Zerodha cares (CSR)</a>
           </div>
-          <div className="col">
-            <p>Support</p>
-            <a href="">Contact</a>
-            <br />
-            <a href="">Support portal</a>
-            <br />
-            <a href="">Z-Connect blog</a>
-            <br />
-            <a href="">List of charges</a>
-            <br />
-            <a href="">Downloads & resources</a>
-            <br />
+          <div className="col-6 col-md-6 col-lg-3 mb-4">
+            <p className="fw-bold">Support</p>
+            <a href="#" className="d-block mb-2">Contact</a>
+            <a href="#" className="d-block mb-2">Support portal</a>
+            <a href="#" className="d-block mb-2">Z-Connect blog</a>
+            <a href="#" className="d-block mb-2">List of charges</a>
+            <a href="#" className="d-block mb-2">Downloads & resources</a>
           </div>
-          <div className="col">
-            <p>Account</p>
-            <a href="">Open an account</a>
-            <br />
-            <a href="">Fund transfer</a>
-            <br />
-            <a href="">60 day challenge</a>
-            <br />
+          <div className="col-12 col-md-6 col-lg-3 mb-4">
+            <p className="fw-bold">Account</p>
+            <a href="#" className="d-block mb-2">Open an account</a>
+            <a href="#" className="d-block mb-2">Fund transfer</a>
+            <a href="#" className="d-block mb-2">60 day challenge</a>
           </div>
         </div>
-        <div className="mt-5 text-muted" style={{ fontSize: "14px" }}>
+        <div className="mt-3 mt-md-5 text-muted pb-4" style={{ fontSize: "12px" }}>
           <p>
             Zerodha Broking Ltd.: Member of NSE​ &​ BSE – SEBI Registration no.:
             INZ000031633 CDSL: Depository services through Zerodha Securities

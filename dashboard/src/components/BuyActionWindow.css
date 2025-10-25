@@ -13,6 +13,17 @@
     border: 1px solid rgb(238, 238, 238);
   }
   
+  @media (max-width: 768px) {
+    .container {
+      width: 95%;
+      height: auto;
+      max-height: 90vh;
+      left: 2.5%;
+      bottom: 5%;
+      overflow-y: auto;
+    }
+  }
+  
   .dragging {
     opacity: 0;
   }
@@ -107,11 +118,25 @@
     margin-bottom: 16px;
   }
   
+  @media (max-width: 768px) {
+    .inputs {
+      flex-wrap: wrap;
+    }
+  }
+  
   .inputs fieldset {
     max-width: 120px;
     box-sizing: border-box;
     border: 0.7px solid #ddd;
     margin-right: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    .inputs fieldset {
+      max-width: 100%;
+      flex: 1 1 45%;
+      margin-bottom: 10px;
+    }
   }
   
   .inputs fieldset legend {
@@ -157,6 +182,20 @@
     position: relative;
     top: 10%;
     padding: 0 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .buttons {
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 20px;
+      top: 5%;
+    }
+    
+    .buttons span {
+      width: 100%;
+      text-align: center;
+    }
   }
   
   .buttons span {
