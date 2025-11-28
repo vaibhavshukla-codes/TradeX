@@ -1,33 +1,43 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from "../api/axios";
 import { VerticalGraph } from "./VerticalGraph";
-import { API_BASE_URL } from "../config/api.config";
 
 // import { holdings } from "../data/data";
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/allHoldings`)
-      .then((res) => {
-        setAllHoldings(res.data);
-      })
-      .catch((error) => {
+    const fetchHoldings = async () => {
+      try {
+        setLoading(true);
+        const res = await API.get('/allHoldings');
+        setAllHoldings(res.data || []);
+        setError(null);
+      } catch (error) {
         console.error('Error fetching holdings:', error);
-        // Optionally set an error state to show to user
-      });
+        setError('Failed to load holdings');
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          alert('Session expired. Please login again.');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHoldings();
   }, []);
 
   // const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  const labels = allHoldings.map((subArray) => subArray["name"]);
+  const labels = allHoldings.map((stock) => stock?.name || 'Unknown');
 
   const data = {
     labels,
     datasets: [
       {
         label: "Stock Price",
-        data: allHoldings.map((stock) => stock.price),
+        data: allHoldings.map((stock) => stock?.price || 0),
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
@@ -49,49 +59,73 @@ const Holdings = () => {
   //   ],
   // };
 
+  if (loading) {
+    return (
+      <>
+        <h3 className="title">Holdings</h3>
+        <p>Loading...</p>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <h3 className="title">Holdings</h3>
+        <p style={{ color: 'red' }}>{error}</p>
+      </>
+    );
+  }
+
   return (
     <>
       <h3 className="title">Holdings ({allHoldings.length})</h3>
 
-      <div className="order-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Instrument</th>
-              <th>Qty.</th>
-              <th>Avg. cost</th>
-              <th>LTP</th>
-              <th>Cur. val</th>
-              <th>P&L</th>
-              <th>Net chg.</th>
-              <th>Day chg.</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allHoldings.map((stock, index) => {
-              const curValue = stock.price * stock.qty;
-              const isProfit = curValue - stock.avg * stock.qty >= 0.0;
-              const profClass = isProfit ? "profit" : "loss";
-              const dayClass = stock.isLoss ? "loss" : "profit";
+      {allHoldings.length === 0 ? (
+        <p>No holdings found.</p>
+      ) : (
+        <div className="order-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Instrument</th>
+                <th>Qty.</th>
+                <th>Avg. cost</th>
+                <th>LTP</th>
+                <th>Cur. val</th>
+                <th>P&L</th>
+                <th>Net chg.</th>
+                <th>Day chg.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allHoldings.map((stock, index) => {
+                if (!stock || !stock.name) return null;
+                const curValue = (stock.price || 0) * (stock.qty || 0);
+                const avgCost = (stock.avg || 0) * (stock.qty || 0);
+                const isProfit = curValue - avgCost >= 0.0;
+                const profClass = isProfit ? "profit" : "loss";
+                const dayClass = stock.isLoss ? "loss" : "profit";
 
-              return (
-                <tr key={index}>
-                  <td>{stock.name}</td>
-                  <td>{stock.qty}</td>
-                  <td>{stock.avg.toFixed(2)}</td>
-                  <td>{stock.price.toFixed(2)}</td>
-                  <td>{curValue.toFixed(2)}</td>
-                  <td className={profClass}>
-                    {(curValue - stock.avg * stock.qty).toFixed(2)}
-                  </td>
-                  <td className={profClass}>{stock.net}</td>
-                  <td className={dayClass}>{stock.day}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                return (
+                  <tr key={stock._id || index}>
+                    <td>{stock.name}</td>
+                    <td>{stock.qty || 0}</td>
+                    <td>{(stock.avg || 0).toFixed(2)}</td>
+                    <td>{(stock.price || 0).toFixed(2)}</td>
+                    <td>{curValue.toFixed(2)}</td>
+                    <td className={profClass}>
+                      {(curValue - avgCost).toFixed(2)}
+                    </td>
+                    <td className={profClass}>{stock.net || '0%'}</td>
+                    <td className={dayClass}>{stock.day || '0%'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <div className="row">
         <div className="col">

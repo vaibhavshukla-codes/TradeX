@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { DASHBOARD_URL } from "../../config/api.config";
 
 function Signup() {
-  const navigate = useNavigate();
   const { signup } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
@@ -27,20 +26,51 @@ function Signup() {
     setLoading(true);
     setError("");
 
+    // Basic validation
     if (!formData.username || !formData.email || !formData.password) {
       setError("All fields are required");
       setLoading(false);
       return;
     }
 
-    const result = await signup(formData);
-    setLoading(false);
+    // Trim whitespace
+    const trimmedData = {
+      username: formData.username.trim(),
+      email: formData.email.trim(),
+      password: formData.password
+    };
 
-    if (result.success) {
-      // Redirect to dashboard after successful signup
-      window.location.href = DASHBOARD_URL;
-    } else {
-      setError(result.message);
+    if (!trimmedData.username || !trimmedData.email || !trimmedData.password) {
+      setError("All fields are required");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await signup(trimmedData);
+
+      if (result && result.success) {
+        if (result.data && result.data.token && result.data.user) {
+          const { token, user } = result.data;
+          const redirectUrl = new URL(DASHBOARD_URL);
+          redirectUrl.searchParams.set('token', token);
+          redirectUrl.searchParams.set(
+            'user',
+            encodeURIComponent(JSON.stringify(user))
+          );
+          window.location.href = redirectUrl.toString();
+          return;
+        }
+        // Fallback: redirect without params (dashboard will check localStorage)
+        window.location.href = DASHBOARD_URL;
+      } else {
+        setError(result?.message || "Signup failed. Please try again.");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
   };
 

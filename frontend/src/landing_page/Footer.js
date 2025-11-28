@@ -1,45 +1,50 @@
 import React from "react";
-import logo from "../TradeXAssets/logo.svg";
 
 function Footer() {
   return (
-    <footer style={{ backgroundColor: "rgb(250, 250, 250)" }}>
-      <div className="container border-top mt-5">
-        <div className="row mt-3 mt-md-5">
+    <footer style={{ 
+      backgroundColor: "rgb(250, 250, 250)", 
+      width: "100%", 
+      marginTop: "auto",
+      paddingTop: "3rem",
+      paddingBottom: "1rem"
+    }}>
+      <div className="container border-top pt-4">
+        <div className="row mt-3 mt-md-5 mb-4">
           <div className="col-12 col-md-6 col-lg-3 mb-4">
-            <img src={logo} style={{ width: "150px", maxWidth: "100%" }} alt="TradeX Logo" />
-            <p className="mt-3">
+            <span style={{ fontSize: "20px", fontWeight: "bold", color: "#387ed1" }}>ZERODHA</span>
+            <p className="mt-3" style={{ fontSize: "14px", color: "#666" }}>
               &copy; 2010 - 2024, Not Zerodha Broking Ltd. All rights reserved.
             </p>
           </div>
           <div className="col-6 col-md-6 col-lg-3 mb-4">
-            <p className="fw-bold">Company</p>
-            <a href="#" className="d-block mb-2">About</a>
-            <a href="#" className="d-block mb-2">Products</a>
-            <a href="#" className="d-block mb-2">Pricing</a>
-            <a href="#" className="d-block mb-2">Referral programme</a>
-            <a href="#" className="d-block mb-2">Careers</a>
-            <a href="#" className="d-block mb-2">Zerodha.tech</a>
-            <a href="#" className="d-block mb-2">Press & media</a>
-            <a href="#" className="d-block mb-2">Zerodha cares (CSR)</a>
+            <p className="fw-bold mb-3" style={{ fontSize: "14px" }}>Company</p>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>About</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Products</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Pricing</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Referral programme</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Careers</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Zerodha.tech</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Press & media</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Zerodha cares (CSR)</a>
           </div>
           <div className="col-6 col-md-6 col-lg-3 mb-4">
-            <p className="fw-bold">Support</p>
-            <a href="#" className="d-block mb-2">Contact</a>
-            <a href="#" className="d-block mb-2">Support portal</a>
-            <a href="#" className="d-block mb-2">Z-Connect blog</a>
-            <a href="#" className="d-block mb-2">List of charges</a>
-            <a href="#" className="d-block mb-2">Downloads & resources</a>
+            <p className="fw-bold mb-3" style={{ fontSize: "14px" }}>Support</p>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Contact</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Support portal</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Z-Connect blog</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>List of charges</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Downloads & resources</a>
           </div>
           <div className="col-12 col-md-6 col-lg-3 mb-4">
-            <p className="fw-bold">Account</p>
-            <a href="#" className="d-block mb-2">Open an account</a>
-            <a href="#" className="d-block mb-2">Fund transfer</a>
-            <a href="#" className="d-block mb-2">60 day challenge</a>
+            <p className="fw-bold mb-3" style={{ fontSize: "14px" }}>Account</p>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Open an account</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Fund transfer</a>
+            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>60 day challenge</a>
           </div>
         </div>
-        <div className="mt-3 mt-md-5 text-muted pb-4" style={{ fontSize: "12px" }}>
-          <p>
+        <div className="mt-3 mt-md-5 text-muted pb-3" style={{ fontSize: "12px", lineHeight: "1.6", color: "#666" }}>
+          <p style={{ marginBottom: "12px" }}>
             Zerodha Broking Ltd.: Member of NSE​ &​ BSE – SEBI Registration no.:
             INZ000031633 CDSL: Depository services through Zerodha Securities
             Pvt. Ltd. – SEBI Registration no.: IN-DP-100-2015 Commodity Trading
@@ -53,19 +58,19 @@ function Footer() {
             by SEBI | ICF
           </p>
 
-          <p>
+          <p style={{ marginBottom: "12px" }}>
             Procedure to file a complaint on SEBI SCORES: Register on SCORES
             portal. Mandatory details for filing complaints on SCORES: Name,
             PAN, Address, Mobile Number, E-mail ID. Benefits: Effective
             Communication, Speedy redressal of the grievances
           </p>
 
-          <p>
+          <p style={{ marginBottom: "12px" }}>
             Investments in securities market are subject to market risks; read
             all the related documents carefully before investing.
           </p>
 
-          <p>
+          <p style={{ marginBottom: "0" }}>
             "Prevent unauthorised transactions in your account. Update your
             mobile numbers/email IDs with your stock brokers. Receive
             information of your transactions directly from Exchange on your

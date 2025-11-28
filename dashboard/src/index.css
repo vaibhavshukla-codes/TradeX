@@ -288,6 +288,7 @@ body {
     padding: 10px 20px;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: space-between;
   }
@@ -309,12 +310,20 @@ body {
   
   .menus {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
   }
   
   .menus ul {
     list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
   }
   
   .menus li {
@@ -353,8 +362,15 @@ body {
   .profile {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
     margin-left: 20px;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  .profile:hover {
+    background-color: rgba(56, 126, 209, 0.1);
   }
   
   .profile .avatar {

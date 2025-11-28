@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { DASHBOARD_URL } from "../../config/api.config";
 
 function Login() {
-  const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
@@ -26,20 +25,51 @@ function Login() {
     setLoading(true);
     setError("");
 
+    // Validate inputs
     if (!formData.username || !formData.password) {
       setError("All fields are required");
       setLoading(false);
       return;
     }
 
-    const result = await login(formData);
-    setLoading(false);
+    // Trim whitespace
+    const credentials = {
+      username: formData.username.trim(),
+      password: formData.password
+    };
 
-    if (result.success) {
-      // Redirect to dashboard after successful login
-      window.location.href = DASHBOARD_URL;
-    } else {
-      setError(result.message || "Invalid username or password");
+    if (!credentials.username || !credentials.password) {
+      setError("Username and password cannot be empty");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await login(credentials);
+      
+      if (result && result.success) {
+        if (result.data && result.data.token && result.data.user) {
+          const { token, user } = result.data;
+          // Redirect to dashboard with token and user in URL params
+          const redirectUrl = new URL(DASHBOARD_URL);
+          redirectUrl.searchParams.set('token', token);
+          redirectUrl.searchParams.set(
+            'user',
+            encodeURIComponent(JSON.stringify(user))
+          );
+          window.location.href = redirectUrl.toString();
+          return;
+        }
+        // Fallback: redirect without params (dashboard will check localStorage)
+        window.location.href = DASHBOARD_URL;
+      } else {
+        setError(result?.message || "Invalid username or password");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError("An error occurred during login. Please try again.");
+      setLoading(false);
     }
   };
 

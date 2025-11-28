@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");
 
-const uri = process.env.MONGO_URL;
+const uri = process.env.MONGO_URL || "mongodb://localhost:27017/tradex";
 
 const seedHoldings = async () => {
   const tempHoldings = [

@@ -1,35 +1,62 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useContext } from "react";
 
-import axios from "axios";
+import API from "../api/axios";
 
 import GeneralContext from "./GeneralContext";
-import { API_BASE_URL } from "../config/api.config";
 
 import "./BuyActionWindow.css";
 
 const BuyActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
+  const [loading, setLoading] = useState(false);
+  const { closeBuyWindow } = useContext(GeneralContext);
 
   const handleBuyClick = () => {
-    axios.post(`${API_BASE_URL}/newOrder`, {
-      name: uid,
-      qty: stockQuantity,
-      price: stockPrice,
+    if (!uid || !uid.trim()) {
+      alert('Please select a stock to buy');
+      return;
+    }
+
+    const qty = Number(stockQuantity);
+    const price = Number(stockPrice);
+
+    if (!qty || qty <= 0) {
+      alert('Please enter a valid quantity');
+      return;
+    }
+
+    if (!price || price <= 0) {
+      alert('Please enter a valid price');
+      return;
+    }
+
+    setLoading(true);
+    API.post('/newOrder', {
+      name: String(uid).trim(),
+      qty: qty,
+      price: price,
       mode: "BUY",
     })
     .then(() => {
-      GeneralContext.closeBuyWindow();
+      alert('Order placed successfully!');
+      closeBuyWindow();
     })
     .catch((error) => {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Failed to place order. Please try again.';
+      alert(errorMessage);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert('Session expired. Please login again.');
+      }
+    })
+    .finally(() => {
+      setLoading(false);
     });
   };
 
   const handleCancelClick = () => {
-    GeneralContext.closeBuyWindow();
+    closeBuyWindow();
   };
 
   return (
@@ -42,7 +69,8 @@ const BuyActionWindow = ({ uid }) => {
               type="number"
               name="qty"
               id="qty"
-              onChange={(e) => setStockQuantity(e.target.value)}
+              min="1"
+              onChange={(e) => setStockQuantity(Number(e.target.value) || 1)}
               value={stockQuantity}
             />
           </fieldset>
@@ -52,8 +80,9 @@ const BuyActionWindow = ({ uid }) => {
               type="number"
               name="price"
               id="price"
+              min="0"
               step="0.05"
-              onChange={(e) => setStockPrice(e.target.value)}
+              onChange={(e) => setStockPrice(Number(e.target.value) || 0)}
               value={stockPrice}
             />
           </fieldset>
@@ -63,12 +92,12 @@ const BuyActionWindow = ({ uid }) => {
       <div className="buttons">
         <span>Margin required ₹140.65</span>
         <div>
-          <Link className="btn btn-blue" onClick={handleBuyClick}>
-            Buy
-          </Link>
-          <Link to="" className="btn btn-grey" onClick={handleCancelClick}>
+          <button className="btn btn-blue" onClick={handleBuyClick} disabled={loading}>
+            {loading ? 'Placing Order...' : 'Buy'}
+          </button>
+          <button className="btn btn-grey" onClick={handleCancelClick}>
             Cancel
-          </Link>
+          </button>
         </div>
       </div>
     </div>

@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { DASHBOARD_URL } from "../config/api.config";
 
 function Navbar() {
+  const { user, logout, isAuthenticated } = useAuth();
+
   return (
     <nav
       className="navbar navbar-expand-lg border-bottom"
@@ -9,11 +13,9 @@ function Navbar() {
     >
       <div className="container p-2">
         <Link className="navbar-brand" to="/">
-          <img
-            src="/media/images/logo.svg"
-            style={{ width: "150px", maxWidth: "100%" }}
-            alt="Logo"
-          />
+          <span style={{ fontSize: "24px", fontWeight: "bold", color: "#387ed1" }}>
+            ZERODHA
+          </span>
         </Link>
         <button
           className="navbar-toggler"
@@ -28,36 +30,66 @@ function Navbar() {
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <Link className="nav-link" to="/signup">
-                Signup
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/about">
-                About
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/product">
-                Product
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/pricing">
-                Pricing
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/support">
-                Support
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">
-                Login
-              </Link>
-            </li>
+            {!isAuthenticated ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/signup">
+                    Signup
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/about">
+                    About
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/product">
+                    Product
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/pricing">
+                    Pricing
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/support">
+                    Support
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    Login
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <span className="nav-link" style={{ color: "#387ed1" }}>
+                    Welcome, {user?.username || user?.email}
+                  </span>
+                </li>
+                <li className="nav-item">
+                  <Link 
+                    className="nav-link" 
+                    to="/dashboard"
+                    onClick={() => window.location.href = DASHBOARD_URL}
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="nav-link btn btn-link"
+                    onClick={logout}
+                    style={{ border: "none", background: "none", textDecoration: "none" }}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

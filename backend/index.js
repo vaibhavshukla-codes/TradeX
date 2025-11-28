@@ -1,289 +1,383 @@
-// require("dotenv").config();
-
-// const express = require("express");
-// const mongoose = require("mongoose");
-// const bodyParser = require("body-parser");
-// const cors = require("cors");
-
-// const PORT = process.env.PORT || 3002;
-// const uri = process.env.MONGO_URL;
-// const HoldingsModel = require("./model/HoldingsModel");
-// const PositionsModel = require("./model/PositionsModel");
-// const OrdersModel = require("./model/OrdersModel");
-
-// const app = express();
-
-// app.use(cors());
-// app.use(bodyParser.json());
-
-// app.get("/allHoldings", async (req, res) => {
-//     let allHoldings = await HoldingsModel.find({});
-//     res.json(allHoldings);
-// });
-
-// app.get("/allPositions", async (req, res) => {
-//     let allPositions = await PositionsModel.find({});
-//     res.json(allPositions);
-// });
-
-// app.post("/newOrder", async (req, res) => {
-//     let newOrder = new OrdersModel({
-//         name: req.body.name,
-//         qty: req.body.qty,
-//         price: req.body.price,
-//         mode: req.body.mode,
-//     });
-
-//     newOrder.save();
-//     res.send("Order saved");
-// });
-
-// app.listen(PORT, () => {
-//     console.log("App is listening on port 3002");
-//     mongoose.connect(uri);
-//     console.log("DB created");
-// });
-
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const app = express();
 
 const PORT = process.env.PORT || 3002;
-const uri = process.env.MONGO_URL;
+const uri = process.env.MONGO_URL || "mongodb://localhost:27017/tradex";
+const JWT_SECRET = process.env.JWT_SECRET || "zerodha_application_secret_key_change_in_production";
 
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");
 const { OrdersModel } = require("./model/OrdersModel");
-
-//login setup
-const passport = require("passport");
-const session = require("express-session");
-const LocalStrategy = require("passport-local");
 const { UserModel } = require("./model/UserModel");
 
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const sessionItems = {
-  secret: "zerodha application",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
+// Middleware - CORS configuration (must be before bodyParser)
+// For development, allow all localhost ports
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost on any port for development
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+    
+    // Allow localhost and local network IPs
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3003',
+      /^http:\/\/192\.168\.\d+\.\d+:\d+$/,  // Allow any 192.168.x.x on any port
+      /^http:\/\/10\.\d+\.\d+\.\d+:\d+$/,   // Allow any 10.x.x.x on any port
+      /^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/, // Allow 172.16-31.x.x on any port
+    ];
+    
+    // Check if origin matches any allowed pattern
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (typeof allowed === 'string') {
+        return origin === allowed;
+      } else if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.log('[CORS] Blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
   },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001"],
-  credentials: true
-}));
+// Apply CORS middleware first (before bodyParser)
+// CORS middleware automatically handles OPTIONS preflight requests
+app.use(cors(corsOptions));
+
 app.use(bodyParser.json());
-app.use(session(sessionItems));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(passport.initialize()); //for any request initialize the passort id
-app.use(passport.session()); //identify the users as the brows from page to page
-passport.use(new LocalStrategy(UserModel.authenticate())); //Jitne bhi user aaye authenticate with Localstrategy
+// JWT Middleware to verify token
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-passport.serializeUser(UserModel.serializeUser());
-passport.deserializeUser(UserModel.deserializeUser());
+  if (!token) {
+    return res.status(401).json({ message: "Access token required" });
+  }
 
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Helper function to generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    { 
+      id: user._id, 
+      username: user.username, 
+      email: user.email 
+    },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+};
+
+// Authentication Routes
 app.post("/signup", async (req, res) => {
   try {
-    let { email, username, password } = req.body;
+    const { email, username, password } = req.body;
+    
+    // Validate input
     if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    let newUser = new UserModel({
-      email: email,
-      username: username,
+
+    // Trim and validate
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedUsername || !trimmedEmail || !trimmedPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
+    }
+
+    // Validate password length
+    if (trimmedPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters long" });
+    }
+
+    // Validate username length
+    if (trimmedUsername.length < 3) {
+      return res.status(400).json({ message: "Username must be at least 3 characters long" });
+    }
+
+    // Check if user already exists
+    const existingUser = await UserModel.findOne({
+      $or: [
+        { email: trimmedEmail },
+        { username: trimmedUsername }
+      ]
     });
-    let registeredUser = await UserModel.register(newUser, password);
-    
-    req.login(registeredUser, (err) => {
-      if (err) {
-        return res.status(500).json({ message: "Error logging in after signup" });
-      }
-      return res.status(200).json({ 
-        message: "User registered successfully",
-        user: {
-          id: registeredUser._id,
-          username: registeredUser.username,
-          email: registeredUser.email
-        }
+
+    if (existingUser) {
+      return res.status(409).json({ 
+        message: existingUser.email === trimmedEmail 
+          ? "Email already exists" 
+          : "Username already exists" 
       });
+    }
+
+    // Create new user
+    const newUser = new UserModel({
+      email: trimmedEmail,
+      username: trimmedUsername,
+      password: trimmedPassword, // Will be hashed by pre-save hook
+    });
+
+    const registeredUser = await newUser.save();
+    
+    // Generate JWT token
+    const token = generateToken(registeredUser);
+
+    return res.status(201).json({ 
+      message: "User registered successfully",
+      token: token,
+      user: {
+        id: registeredUser._id,
+        username: registeredUser.username,
+        email: registeredUser.email
+      }
     });
   } catch (error) {
     console.error('[Signup Error]', error.message);
-    if (error.name === 'UserExistsError') {
-      return res.status(409).json({ message: "Username already exists" });
+    console.error('[Signup Error Details]', error);
+    
+    // Handle duplicate key error (MongoDB)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(409).json({ 
+        message: `${field} already exists` 
+      });
     }
-    return res.status(500).json({ message: "Error registering user" });
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: messages.join(', ') || "Validation error"
+      });
+    }
+    
+    return res.status(500).json({ 
+      message: "Error registering user. Please try again."
+    });
   }
 });
 
-app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.status(200).json({ 
-    message: "Logged in successfully",
-    user: {
-      id: req.user._id,
-      username: req.user.username,
-      email: req.user.email
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
     }
-  });
+
+    // Trim and validate username
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      return res.status(400).json({ message: "Username cannot be empty" });
+    }
+
+    // Don't trim password, but check if it's empty
+    if (!password || password.length === 0) {
+      return res.status(400).json({ message: "Password cannot be empty" });
+    }
+
+    // Find user by username or email (case-insensitive for email)
+    const user = await UserModel.findOne({
+      $or: [
+        { username: trimmedUsername },
+        { email: trimmedUsername.toLowerCase() }
+      ]
+    });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Compare password (don't trim password for comparison)
+    const isPasswordValid = await user.comparePassword(password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Generate JWT token
+    const token = generateToken(user);
+
+    return res.status(200).json({ 
+      message: "Logged in successfully",
+      token: token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('[Login Error]', error.message);
+    console.error('[Login Error Details]', error);
+    return res.status(500).json({ 
+      message: "Error during login. Please try again."
+    });
+  }
 });
 
-app.post("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ message: "Error logging out" });
+app.get("/checkAuth", authenticateToken, async (req, res) => {
+  try {
+    // If middleware passed, token is valid
+    const user = await UserModel.findById(req.user.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ message: "Logged out successfully" });
-  });
-});
 
-app.get("/checkAuth", (req, res) => {
-  if (req.isAuthenticated()) {
     return res.status(200).json({ 
       authenticated: true,
       user: {
-        id: req.user._id,
-        username: req.user.username,
-        email: req.user.email
+        id: user._id,
+        username: user.username,
+        email: user.email
       }
     });
+  } catch (error) {
+    console.error('[CheckAuth Error]', error.message);
+    return res.status(500).json({ 
+      authenticated: false,
+      message: "Error checking authentication" 
+    });
   }
-  res.status(401).json({ authenticated: false });
 });
 
-// app.get("/demo", async (req, res) => {
-//   let demoUser = new UserModel({
-//     email: "ik@gmail.com",
-//     username: "@ik",
-//   });
-//   let newUser = await UserModel.register(demoUser, "demo");
-//   console.log(newUser);
-//   res.send(newUser);
-// });
+// Protected Routes - Trading Data
+app.get("/allHoldings", authenticateToken, async (req, res) => {
+  try {
+    const allHoldings = await HoldingsModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(allHoldings);
+  } catch (error) {
+    console.error('[AllHoldings Error]', error.message);
+    res.status(500).json({ message: "Error fetching holdings" });
+  }
+});
 
-// app.get("/addHoldigs", async (req, res) => {
-//   let tempHoldings = [
-//     {
-//       name: "BHARTIARTL",
-//       qty: 2,
-//       avg: 538.05,
-//       price: 541.15,
-//       net: "+0.58%",
-//       day: "+2.99%",
-//     },
-//     {
-//       name: "HDFCBANK",
-//       qty: 2,
-//       avg: 1383.4,
-//       price: 1522.35,
-//       net: "+10.04%",
-//       day: "+0.11%",
-//     },
-//     {
-//       name: "HINDUNILVR",
-//       qty: 1,
-//       avg: 2335.85,
-//       price: 2417.4,
-//       net: "+3.49%",
-//       day: "+0.21%",
-//     },
-//     {
-//       name: "INFY",
-//       qty: 1,
-//       avg: 1350.5,
-//       price: 1555.45,
-//       net: "+15.18%",
-//       day: "-1.60%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "ITC",
-//       qty: 5,
-//       avg: 202.0,
-//       price: 207.9,
-//       net: "+2.92%",
-//       day: "+0.80%",
-//     },
-//     {
-//       name: "KPITTECH",
-//       qty: 5,
-//       avg: 250.3,
-//       price: 266.45,
-//       net: "+6.45%",
-//       day: "+3.54%",
-//     },
-//     {
-//       name: "M&M",
-//       qty: 2,
-//       avg: 809.9,
-//       price: 779.8,
-//       net: "-3.72%",
-//       day: "-0.01%",
-//       isLoss: true,
-//     },
-//     {
-//       name: "RELIANCE",
-//       qty: 1,
-//       avg: 2193.7,
-//       price: 2112.4,
-//       net: "-3.71%",
-//       day: "+1.44%",
-//     },
-//   ];
+app.get("/allPositions", authenticateToken, async (req, res) => {
+  try {
+    const allPositions = await PositionsModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(allPositions);
+  } catch (error) {
+    console.error('[AllPositions Error]', error.message);
+    res.status(500).json({ message: "Error fetching positions" });
+  }
+});
 
-//   tempHoldings.forEach((item) => {
-//     let newHoldings = new HoldingsModel({
-//       name: item.name,
-//       qty: item.qty,
-//       avg: item.avg,
-//       price: item.price,
-//       net: item.net,
-//       day: item.day,
-//     });
-//     newHoldings.save();
-//   });
-//   res.send("holdings data saved");
-// });
+app.get("/allOrders", authenticateToken, async (req, res) => {
+  try {
+    const allOrders = await OrdersModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(allOrders);
+  } catch (error) {
+    console.error('[AllOrders Error]', error.message);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+});
 
-app.post("/newOrder", async (req, res) => {
-    try {
-      let newOrder = new OrdersModel({
-        name: req.body.name,
-        qty: req.body.qty,
-        price: req.body.price,
-        mode: req.body.mode,
-      });
-  
-      await newOrder.save();
-      res.send("Order saved");
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error saving order");
+app.post("/newOrder", authenticateToken, async (req, res) => {
+  try {
+    const { name, qty, price, mode } = req.body;
+
+    if (!name || qty === undefined || price === undefined || !mode) {
+      return res.status(400).json({ message: "All order fields are required" });
     }
-  });
-  
 
-app.get("/allHoldings", async (req, res) => {
-  let allholdings = await HoldingsModel.find({});
-  res.json(allholdings);
+    // Validate data types
+    if (typeof qty !== 'number' || qty <= 0) {
+      return res.status(400).json({ message: "Quantity must be a positive number" });
+    }
+
+    if (typeof price !== 'number' || price <= 0) {
+      return res.status(400).json({ message: "Price must be a positive number" });
+    }
+
+    const newOrder = new OrdersModel({
+      name: String(name),
+      qty: Number(qty),
+      price: Number(price),
+      mode: String(mode).toUpperCase(),
+      userId: req.user.id, // Associate order with user
+    });
+
+    await newOrder.save();
+    res.status(201).json({ message: "Order saved successfully", order: newOrder });
+  } catch (error) {
+    console.error('[NewOrder Error]', error.message);
+    res.status(500).json({ message: "Error saving order", error: error.message });
+  }
 });
 
-app.get("/allPositions", async (req, res) => {
-  let allpositions = await PositionsModel.find({});
-  res.json(allpositions);
+// Database connection with better error handling
+mongoose.connection.on('connected', () => {
+  console.log('MongoDB Connected successfully');
 });
 
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB Connection Error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB Disconnected');
+});
+
+// Connect to MongoDB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+    });
+    console.log("MongoDB Connected successfully");
+  } catch (err) {
+    console.error("MongoDB Connection Error:", err.message);
+    // Don't exit process, let server start and retry
+    setTimeout(connectDB, 5000); // Retry after 5 seconds
+  }
+};
+
+// Start server
 app.listen(PORT, async () => {
-  console.log("App started on port 3002");
-  await mongoose
-    .connect(uri)
-    .then(() => console.log("MongoDB Connected"))
-    .catch((err) => console.error("MongoDB Connection Error:", err));
+  console.log(`App started on port ${PORT}`);
+  await connectDB();
 });

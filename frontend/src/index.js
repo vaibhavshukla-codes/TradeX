@@ -26,18 +26,22 @@ root.render(
     }}
   >
     <AuthProvider>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/product" element={<ProductPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/support" element={<SupportPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Footer />
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
+        <div style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/product" element={<ProductPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/support" element={<SupportPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+        <Footer />
+      </div>
     </AuthProvider>
   </BrowserRouter>
 );

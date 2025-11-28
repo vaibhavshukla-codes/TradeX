@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api.config';
+import { API_BASE_URL, FRONTEND_URL } from '../config/api.config';
 
 const API = axios.create({
   baseURL: API_BASE_URL,
@@ -30,10 +30,8 @@ API.interceptors.response.use(
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login if not already there
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
-        window.location.href = '/login';
-      }
+      // Redirect to login
+      window.location.href = `${FRONTEND_URL}/login`;
     }
     return Promise.reject(error);
   }
