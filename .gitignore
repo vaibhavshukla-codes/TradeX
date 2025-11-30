@@ -8,7 +8,10 @@ lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_READY.md
+QUICK_DEPLOY_CHECKLIST.md
+RENDER_VERCEL_DEPLOYMENT.md
 # Runtime data
 pids
 *.pid
