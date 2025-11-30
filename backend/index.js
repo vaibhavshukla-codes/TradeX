@@ -368,7 +368,7 @@ const connectDB = async () => {
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
     });
-    console.log("MongoDB Connected successfully");
+    // Connection success is logged by the 'connected' event listener above
   } catch (err) {
     console.error("MongoDB Connection Error:", err.message);
     // Don't exit process, let server start and retry
