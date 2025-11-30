@@ -44,7 +44,7 @@ const Home = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        window.location.href = `${FRONTEND_URL}/login`;
+        window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
         return;
       }
 
@@ -55,13 +55,13 @@ const Home = () => {
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = `${FRONTEND_URL}/login`;
+        window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = `${FRONTEND_URL}/login`;
+      window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
     } finally {
       setLoading(false);
     }

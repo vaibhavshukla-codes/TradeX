@@ -30,8 +30,8 @@ API.interceptors.response.use(
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login
-      window.location.href = `${FRONTEND_URL}/login`;
+      // Redirect to login - use FRONTEND_URL if set, otherwise relative URL
+      window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
     }
     return Promise.reject(error);
   }

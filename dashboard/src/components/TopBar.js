@@ -42,7 +42,7 @@ const TopBar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = `${FRONTEND_URL}/`;
+    window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/` : '/';
   };
 
   const userInitials = user ? (user.username || user.email || 'U').substring(0, 2).toUpperCase() : 'ZU';
