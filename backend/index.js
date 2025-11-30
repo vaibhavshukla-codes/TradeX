@@ -17,26 +17,49 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 // Middleware - CORS configuration (must be before bodyParser)
-// For development, allow all localhost ports
+// Supports both development and production via environment variables
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Allow localhost on any port for development
-    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-      return callback(null, true);
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    
+    // Development: Allow localhost on any port
+    if (isDevelopment) {
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true);
+      }
     }
     
-    // Allow localhost and local network IPs
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3003',
-      /^http:\/\/192\.168\.\d+\.\d+:\d+$/,  // Allow any 192.168.x.x on any port
-      /^http:\/\/10\.\d+\.\d+\.\d+:\d+$/,   // Allow any 10.x.x.x on any port
-      /^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/, // Allow 172.16-31.x.x on any port
-    ];
+    // Build allowed origins list
+    const allowedOrigins = [];
+    
+    // Add production domains from environment variables
+    if (process.env.FRONTEND_URL) {
+      allowedOrigins.push(process.env.FRONTEND_URL);
+    }
+    if (process.env.DASHBOARD_URL) {
+      allowedOrigins.push(process.env.DASHBOARD_URL);
+    }
+    
+    // Add additional allowed origins from comma-separated env variable
+    if (process.env.ALLOWED_ORIGINS) {
+      const additionalOrigins = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim());
+      allowedOrigins.push(...additionalOrigins);
+    }
+    
+    // Development: Add localhost origins
+    if (isDevelopment) {
+      allowedOrigins.push(
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3003',
+        /^http:\/\/192\.168\.\d+\.\d+:\d+$/,  // Allow any 192.168.x.x on any port
+        /^http:\/\/10\.\d+\.\d+\.\d+:\d+$/,   // Allow any 10.x.x.x on any port
+        /^http:\/\/172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+:\d+$/ // Allow 172.16-31.x.x on any port
+      );
+    }
     
     // Check if origin matches any allowed pattern
     const isAllowed = allowedOrigins.some(allowed => {
@@ -51,7 +74,9 @@ const corsOptions = {
     if (isAllowed) {
       callback(null, true);
     } else {
-      console.log('[CORS] Blocked origin:', origin);
+      if (isDevelopment) {
+        console.log('[CORS] Blocked origin:', origin);
+      }
       callback(new Error('Not allowed by CORS'));
     }
   },

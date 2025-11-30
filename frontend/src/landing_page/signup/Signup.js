@@ -162,7 +162,7 @@ function Signup() {
 
           <div className="text-center mt-4">
             <p className="text-muted small">
-              I authorise TradeX to contact me via phone, email, or WhatsApp to
+              I authorise Zerodha to contact me via phone, email, or WhatsApp to
               assist me through my signup journey. Consents here override any
               previous registration with DNC / NDNC.
             </p>

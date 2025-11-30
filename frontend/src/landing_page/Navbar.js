@@ -8,11 +8,14 @@ function Navbar() {
   const navigate = useNavigate();
   const isLoggingOut = useRef(false);
 
-  // Navigate to home after logout completes
+  // Navigate to home after logout completes (only when explicitly logging out)
   useEffect(() => {
     if (isLoggingOut.current && !isAuthenticated && !user) {
       isLoggingOut.current = false;
-      navigate("/", { replace: true });
+      // Only navigate if we're not already on home page
+      if (window.location.pathname !== '/') {
+        navigate("/", { replace: true });
+      }
     }
   }, [isAuthenticated, user, navigate]);
 

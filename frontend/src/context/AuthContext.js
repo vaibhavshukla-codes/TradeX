@@ -17,19 +17,29 @@ export const AuthProvider = ({ children }) => {
   const isLoggingOutRef = useRef(false);
 
   useEffect(() => {
-    // Don't restore user if we're in the process of logging out
-    if (isLoggingOutRef.current) {
-      setLoading(false);
-      return;
-    }
+    const initializeAuth = () => {
+      // Check if token exists in localStorage first
+      const token = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
+      
+      // If no token or user, ensure state is cleared immediately
+      if (!token || !savedUser) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
-    // Check if token exists in localStorage
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    
-    if (token && savedUser) {
+      // Don't restore user if we're in the process of logging out
+      if (isLoggingOutRef.current) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+      
       try {
-        setUser(JSON.parse(savedUser));
+        // Only restore user if we have both token and user data
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
         // Verify token is still valid
         checkAuth();
       } catch (error) {
@@ -39,9 +49,27 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setLoading(false);
       }
-    } else {
-      setLoading(false);
-    }
+    };
+
+    initializeAuth();
+
+    // Listen for storage changes (e.g., when logout happens in another tab/window)
+    const handleStorageChange = (e) => {
+      if (e.key === 'token' || e.key === 'user') {
+        const token = localStorage.getItem('token');
+        const savedUser = localStorage.getItem('user');
+        if (!token || !savedUser) {
+          setUser(null);
+          setLoading(false);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -233,10 +261,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setLoading(false);
     
-    // Reset flag after a brief delay to allow state to update
+    // Reset flag after state has time to update and prevent any restoration
     setTimeout(() => {
       isLoggingOutRef.current = false;
-    }, 100);
+    }, 500);
     
     return { success: true };
   };
