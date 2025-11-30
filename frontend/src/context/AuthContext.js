@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import API from '../api/axios';
 
 const AuthContext = createContext();
@@ -14,8 +14,15 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isLoggingOutRef = useRef(false);
 
   useEffect(() => {
+    // Don't restore user if we're in the process of logging out
+    if (isLoggingOutRef.current) {
+      setLoading(false);
+      return;
+    }
+
     // Check if token exists in localStorage
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
@@ -39,8 +46,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
+    // Don't check auth if we're logging out
+    if (isLoggingOutRef.current) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await API.get('/checkAuth');
+      // Double-check we're not logging out before setting user
+      if (isLoggingOutRef.current) {
+        setLoading(false);
+        return;
+      }
       if (response.data.authenticated) {
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -51,9 +69,12 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       // User is not authenticated
-      setUser(null);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Don't update state if we're logging out
+      if (!isLoggingOutRef.current) {
+        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     } finally {
       setLoading(false);
     }
@@ -203,10 +224,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Set flag to prevent checkAuth from restoring user
+    isLoggingOutRef.current = true;
+    
     // Clear localStorage and state synchronously
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    setLoading(false);
+    
+    // Reset flag after a brief delay to allow state to update
+    setTimeout(() => {
+      isLoggingOutRef.current = false;
+    }, 100);
+    
     return { success: true };
   };
 

@@ -27,9 +27,8 @@ const UserSchema = new Schema({
   timestamps: true,
 });
 
-// Add indexes for better query performance
-UserSchema.index({ email: 1 });
-UserSchema.index({ username: 1 });
+// Note: email and username already have indexes created by unique: true
+// No need to add explicit indexes for them
 
 // Hash password before saving
 UserSchema.pre("save", async function (next) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { DASHBOARD_URL } from "../config/api.config";
@@ -6,10 +6,19 @@ import { DASHBOARD_URL } from "../config/api.config";
 function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const isLoggingOut = useRef(false);
+
+  // Navigate to home after logout completes
+  useEffect(() => {
+    if (isLoggingOut.current && !isAuthenticated && !user) {
+      isLoggingOut.current = false;
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogout = () => {
+    isLoggingOut.current = true;
     logout();
-    navigate("/");
   };
 
   return (
