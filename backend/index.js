@@ -5,7 +5,19 @@ const jwt = require("jsonwebtoken");
 const app = express();
 
 const PORT = process.env.PORT || 3002;
-const uri = process.env.MONGO_URL || "mongodb://localhost:27017/tradex";
+
+// MongoDB Atlas connection string - REQUIRED
+if (!process.env.MONGO_URL) {
+  console.error('ERROR: MONGO_URL environment variable is required!');
+  console.error('Please set MONGO_URL in your .env file with your MongoDB Atlas connection string.');
+  process.exit(1);
+}
+const uri = process.env.MONGO_URL;
+
+// JWT Secret - REQUIRED for production
+if (!process.env.JWT_SECRET) {
+  console.warn('WARNING: JWT_SECRET not set. Using default (NOT SECURE for production).');
+}
 const JWT_SECRET = process.env.JWT_SECRET || "zerodha_application_secret_key_change_in_production";
 
 const { HoldingsModel } = require("./model/HoldingsModel");
@@ -184,7 +196,30 @@ app.post("/signup", async (req, res) => {
       password: trimmedPassword, // Will be hashed by pre-save hook
     });
 
+    // Check if MongoDB is connected
+    if (mongoose.connection.readyState !== 1) {
+      console.error('[Signup Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return res.status(503).json({ message: "Database connection not available. Please try again." });
+    }
+
+    console.log('[Signup] Attempting to save user:', {
+      username: trimmedUsername,
+      email: trimmedEmail,
+      database: mongoose.connection.db?.databaseName,
+      connectionState: mongoose.connection.readyState
+    });
+
     const registeredUser = await newUser.save();
+    
+    // Log successful save for debugging
+    console.log('[Signup Success] User saved successfully:', {
+      id: registeredUser._id,
+      username: registeredUser.username,
+      email: registeredUser.email,
+      database: mongoose.connection.db?.databaseName,
+      collection: 'users',
+      createdAt: registeredUser.createdAt
+    });
     
     // Generate JWT token
     const token = generateToken(registeredUser);
@@ -201,10 +236,14 @@ app.post("/signup", async (req, res) => {
   } catch (error) {
     console.error('[Signup Error]', error.message);
     console.error('[Signup Error Details]', error);
+    console.error('[Signup Error Stack]', error.stack);
+    console.error('[MongoDB Connection State]', mongoose.connection.readyState);
+    console.error('[MongoDB Database]', mongoose.connection.db?.databaseName);
     
     // Handle duplicate key error (MongoDB)
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
+      console.error('[Signup Error] Duplicate key:', field, error.keyValue);
       return res.status(409).json({ 
         message: `${field} already exists` 
       });
@@ -213,13 +252,23 @@ app.post("/signup", async (req, res) => {
     // Handle validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
+      console.error('[Signup Error] Validation failed:', messages);
       return res.status(400).json({ 
         message: messages.join(', ') || "Validation error"
       });
     }
     
+    // Handle save errors
+    if (error.name === 'MongoServerError') {
+      console.error('[Signup Error] MongoDB server error:', error.message);
+      return res.status(500).json({ 
+        message: "Database error. Please try again."
+      });
+    }
+    
     return res.status(500).json({ 
-      message: "Error registering user. Please try again."
+      message: "Error registering user. Please try again.",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
@@ -405,4 +454,9 @@ const connectDB = async () => {
 app.listen(PORT, async () => {
   console.log(`App started on port ${PORT}`);
   await connectDB();
+  // Log database name for debugging
+  if (mongoose.connection.db) {
+    console.log(`Database name: ${mongoose.connection.db.databaseName}`);
+    console.log(`Collections: ${(await mongoose.connection.db.listCollections().toArray()).map(c => c.name).join(', ')}`);
+  }
 });
