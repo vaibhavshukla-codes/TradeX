@@ -3,7 +3,13 @@ const mongoose = require("mongoose");
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");
 
-const uri = process.env.MONGO_URL || "mongodb://localhost:27017/tradex";
+// MongoDB Atlas connection string - REQUIRED
+if (!process.env.MONGO_URL) {
+  console.error('ERROR: MONGO_URL environment variable is required!');
+  console.error('Please set MONGO_URL in your .env file with your MongoDB Atlas connection string.');
+  process.exit(1);
+}
+const uri = process.env.MONGO_URL;
 
 const seedHoldings = async () => {
   const tempHoldings = [
