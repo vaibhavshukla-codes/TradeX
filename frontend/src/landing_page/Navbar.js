@@ -1,10 +1,16 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { DASHBOARD_URL } from "../config/api.config";
 
 function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <nav
@@ -82,7 +88,7 @@ function Navbar() {
                 <li className="nav-item">
                   <button
                     className="nav-link btn btn-link"
-                    onClick={logout}
+                    onClick={handleLogout}
                     style={{ border: "none", background: "none", textDecoration: "none" }}
                   >
                     Logout

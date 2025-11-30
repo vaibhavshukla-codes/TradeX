@@ -202,18 +202,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
-    try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setUser(null);
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: 'Logout failed' 
-      };
-    }
+  const logout = () => {
+    // Clear localStorage and state synchronously
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    return { success: true };
   };
 
   const value = {
