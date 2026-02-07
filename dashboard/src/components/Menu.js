@@ -98,9 +98,9 @@ const Menu = () => {
           <Link
             style={{ textDecoration: "none" }}
             to="/apps"
-            onClick={() => handleMenuClick(6)}
+            onClick={() => handleMenuClick(5)}
           >
-            <p className={selectedMenu === 6 ? activeMenuClass : menuClass} style={{ 
+            <p className={selectedMenu === 5 ? activeMenuClass : menuClass} style={{ 
               margin: 0, 
               padding: "8px 16px",
               borderRadius: "4px",

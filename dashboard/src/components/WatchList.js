@@ -117,7 +117,7 @@ const WatchListItem = ({ stock }) => {
           {stock.isDown ? (
             <KeyboardArrowDown className="down" />
           ) : (
-            <KeyboardArrowUp className="down" />
+            <KeyboardArrowUp className="up" />
           )}
           <span className="price">{stock.price}</span>
         </div>
@@ -132,6 +132,10 @@ const WatchListActions = ({ uid }) => {
 
   const handleBuyClick = () => {
     generalContext.openBuyWindow(uid);
+  };
+  
+  const handleSellClick = () => {
+    generalContext.openSellWindow(uid);
   };
 
   return (
@@ -151,7 +155,7 @@ const WatchListActions = ({ uid }) => {
           arrow
           TransitionComponent={Grow}
         >
-          <button className="sell">Sell</button>
+          <button className="sell" onClick={handleSellClick}>Sell</button>
         </Tooltip>
         <Tooltip
           title="Analytics (A)"

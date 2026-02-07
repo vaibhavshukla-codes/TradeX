@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../api/axios";
-// import { positions } from "../data/data";
+import { positions as samplePositions } from "../data/data";
 
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
@@ -12,7 +12,10 @@ const Positions = () => {
       try {
         setLoading(true);
         const res = await API.get('/allPositions');
-        setAllPositions(res.data || []);
+        const fetched = res.data || [];
+        const useSample =
+          process.env.NODE_ENV !== 'production' && fetched.length === 0;
+        setAllPositions(useSample ? samplePositions : fetched);
         setError(null);
       } catch (error) {
         console.error('Error fetching positions:', error);

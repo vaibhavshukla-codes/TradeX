@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const app = express();
 
 const PORT = process.env.PORT || 3002;
+const isProduction = process.env.NODE_ENV === 'production';
 
 // MongoDB Atlas connection string - REQUIRED
 if (!process.env.MONGO_URL) {
@@ -19,6 +20,20 @@ if (!process.env.JWT_SECRET) {
   console.warn('WARNING: JWT_SECRET not set. Using default (NOT SECURE for production).');
 }
 const JWT_SECRET = process.env.JWT_SECRET || "zerodha_application_secret_key_change_in_production";
+
+// Production safety checks for CORS
+if (isProduction) {
+  const hasCorsOrigins =
+    Boolean(process.env.FRONTEND_URL) ||
+    Boolean(process.env.DASHBOARD_URL) ||
+    Boolean(process.env.ALLOWED_ORIGINS);
+
+  if (!hasCorsOrigins) {
+    console.error('ERROR: Production CORS origins are not configured.');
+    console.error('Set FRONTEND_URL and/or DASHBOARD_URL (or ALLOWED_ORIGINS) in your environment.');
+    process.exit(1);
+  }
+}
 
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");

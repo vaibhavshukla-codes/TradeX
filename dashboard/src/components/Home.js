@@ -44,7 +44,9 @@ const Home = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
+        if (FRONTEND_URL) {
+          window.location.href = `${FRONTEND_URL}/login`;
+        }
         return;
       }
 
@@ -55,13 +57,17 @@ const Home = () => {
       } else {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
+        if (FRONTEND_URL) {
+          window.location.href = `${FRONTEND_URL}/login`;
+        }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = FRONTEND_URL ? `${FRONTEND_URL}/login` : '/login';
+      if (FRONTEND_URL) {
+        window.location.href = `${FRONTEND_URL}/login`;
+      }
     } finally {
       setLoading(false);
     }
@@ -76,7 +82,17 @@ const Home = () => {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', padding: '24px', textAlign: 'center' }}>
+        <div>
+          <h2>Not authenticated</h2>
+          <p>Please login to continue.</p>
+          {FRONTEND_URL && (
+            <a href={`${FRONTEND_URL}/login`}>Go to Login</a>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -6,7 +6,7 @@ import GeneralContext from "./GeneralContext";
 
 import "./BuyActionWindow.css";
 
-const BuyActionWindow = ({ uid }) => {
+const BuyActionWindow = ({ uid, mode = "BUY" }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ const BuyActionWindow = ({ uid }) => {
 
   const handleBuyClick = () => {
     if (!uid || !uid.trim()) {
-      alert('Please select a stock to buy');
+      alert(`Please select a stock to ${mode === "SELL" ? "sell" : "buy"}`);
       return;
     }
 
@@ -36,10 +36,10 @@ const BuyActionWindow = ({ uid }) => {
       name: String(uid).trim(),
       qty: qty,
       price: price,
-      mode: "BUY",
+      mode: mode,
     })
     .then(() => {
-      alert('Order placed successfully!');
+      alert(`${mode === "SELL" ? "Sell" : "Buy"} order placed successfully!`);
       closeBuyWindow();
     })
     .catch((error) => {
@@ -93,7 +93,7 @@ const BuyActionWindow = ({ uid }) => {
         <span>Margin required ₹140.65</span>
         <div>
           <button className="btn btn-blue" onClick={handleBuyClick} disabled={loading}>
-            {loading ? 'Placing Order...' : 'Buy'}
+            {loading ? 'Placing Order...' : (mode === "SELL" ? "Sell" : "Buy")}
           </button>
           <button className="btn btn-grey" onClick={handleCancelClick}>
             Cancel

@@ -1,12 +1,18 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
-import API from '../api/axios';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
+import API from "../api/axios";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -19,9 +25,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = () => {
       // Check if token exists in localStorage first
-      const token = localStorage.getItem('token');
-      const savedUser = localStorage.getItem('user');
-      
+      const token = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
+
       // If no token or user, ensure state is cleared immediately
       if (!token || !savedUser) {
         setUser(null);
@@ -35,7 +41,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-      
+
       try {
         // Only restore user if we have both token and user data
         const parsedUser = JSON.parse(savedUser);
@@ -43,9 +49,9 @@ export const AuthProvider = ({ children }) => {
         // Verify token is still valid
         checkAuth();
       } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         setUser(null);
         setLoading(false);
       }
@@ -55,9 +61,9 @@ export const AuthProvider = ({ children }) => {
 
     // Listen for storage changes (e.g., when logout happens in another tab/window)
     const handleStorageChange = (e) => {
-      if (e.key === 'token' || e.key === 'user') {
-        const token = localStorage.getItem('token');
-        const savedUser = localStorage.getItem('user');
+      if (e.key === "token" || e.key === "user") {
+        const token = localStorage.getItem("token");
+        const savedUser = localStorage.getItem("user");
         if (!token || !savedUser) {
           setUser(null);
           setLoading(false);
@@ -65,43 +71,39 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
-    // Don't check auth if we're logging out
     if (isLoggingOutRef.current) {
       setLoading(false);
       return;
     }
 
     try {
-      const response = await API.get('/checkAuth');
-      // Double-check we're not logging out before setting user
+      const response = await API.get("/checkAuth");
       if (isLoggingOutRef.current) {
         setLoading(false);
         return;
       }
       if (response.data.authenticated) {
         setUser(response.data.user);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       } else {
         setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     } catch (error) {
-      // User is not authenticated
-      // Don't update state if we're logging out
       if (!isLoggingOutRef.current) {
         setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     } finally {
       setLoading(false);
@@ -114,7 +116,7 @@ export const AuthProvider = ({ children }) => {
       if (!userData.username || !userData.email || !userData.password) {
         return {
           success: false,
-          message: 'All fields are required'
+          message: "All fields are required",
         };
       }
 
@@ -122,13 +124,17 @@ export const AuthProvider = ({ children }) => {
       const trimmedData = {
         username: userData.username.trim(),
         email: userData.email.trim().toLowerCase(),
-        password: userData.password
+        password: userData.password,
       };
 
-      if (!trimmedData.username || !trimmedData.email || !trimmedData.password) {
+      if (
+        !trimmedData.username ||
+        !trimmedData.email ||
+        !trimmedData.password
+      ) {
         return {
           success: false,
-          message: 'All fields are required'
+          message: "All fields are required",
         };
       }
 
@@ -137,53 +143,54 @@ export const AuthProvider = ({ children }) => {
       if (!emailRegex.test(trimmedData.email)) {
         return {
           success: false,
-          message: 'Please enter a valid email address'
+          message: "Please enter a valid email address",
         };
       }
 
-      const response = await API.post('/signup', trimmedData);
-      
+      const response = await API.post("/signup", trimmedData);
+
       if (response.data && response.data.token && response.data.user) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         setUser(response.data.user);
-        return { 
-          success: true, 
+        return {
+          success: true,
           data: {
             token: response.data.token,
-            user: response.data.user
-          }
+            user: response.data.user,
+          },
         };
       } else {
         return {
           success: false,
-          message: 'Invalid response from server'
+          message: "Invalid response from server",
         };
       }
     } catch (error) {
-      console.error('Signup error:', error);
-      
+      console.error("Signup error:", error);
+
       // Handle different error types
       if (error.response) {
         // Server responded with error status
-        const errorMessage = error.response.data?.message || 
-                           error.response.data?.error || 
-                           'Signup failed. Please try again.';
+        const errorMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          "Signup failed. Please try again.";
         return {
           success: false,
-          message: errorMessage
+          message: errorMessage,
         };
       } else if (error.request) {
         // Request was made but no response received
         return {
           success: false,
-          message: 'Unable to connect to server. Please check your connection.'
+          message: "Unable to connect to server. Please check your connection.",
         };
       } else {
         // Something else happened
         return {
           success: false,
-          message: error.message || 'An unexpected error occurred'
+          message: error.message || "An unexpected error occurred",
         };
       }
     }
@@ -195,57 +202,58 @@ export const AuthProvider = ({ children }) => {
       if (!credentials.username || !credentials.password) {
         return {
           success: false,
-          message: 'Username and password are required'
+          message: "Username and password are required",
         };
       }
 
-      const response = await API.post('/login', credentials);
-      
+      const response = await API.post("/login", credentials);
+
       if (response.data && response.data.token && response.data.user) {
         // Store token and user in localStorage
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+
         // Update user state
         setUser(response.data.user);
-        
-        return { 
-          success: true, 
+
+        return {
+          success: true,
           data: {
             token: response.data.token,
-            user: response.data.user
-          }
+            user: response.data.user,
+          },
         };
       } else {
         return {
           success: false,
-          message: 'Invalid response from server'
+          message: "Invalid response from server",
         };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      
+      console.error("Login error:", error);
+
       // Handle different error types
       if (error.response) {
         // Server responded with error status
-        const errorMessage = error.response.data?.message || 
-                           error.response.data?.error || 
-                           'Login failed. Please check your credentials.';
+        const errorMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          "Login failed. Please check your credentials.";
         return {
           success: false,
-          message: errorMessage
+          message: errorMessage,
         };
       } else if (error.request) {
         // Request was made but no response received
         return {
           success: false,
-          message: 'Unable to connect to server. Please check your connection.'
+          message: "Unable to connect to server. Please check your connection.",
         };
       } else {
         // Something else happened
         return {
           success: false,
-          message: error.message || 'An unexpected error occurred'
+          message: error.message || "An unexpected error occurred",
         };
       }
     }
@@ -254,18 +262,18 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     // Set flag to prevent checkAuth from restoring user
     isLoggingOutRef.current = true;
-    
+
     // Clear localStorage and state synchronously
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
     setLoading(false);
-    
+
     // Reset flag after state has time to update and prevent any restoration
     setTimeout(() => {
       isLoggingOutRef.current = false;
     }, 500);
-    
+
     return { success: true };
   };
 
@@ -280,4 +288,3 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
