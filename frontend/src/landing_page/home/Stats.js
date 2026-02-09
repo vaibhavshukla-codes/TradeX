@@ -32,11 +32,11 @@ function Stats() {
         <div className="col-12 col-lg-6 p-3 p-md-5">
           <img src={ecosystem} className="img-fluid mb-4" alt="Ecosystem" />
           <div className="text-center">
-            <a href="#" className="d-block d-md-inline mx-0 mx-md-5 mb-3 mb-md-0" style={{ textDecoration: "none" }}>
+            <a href="/" className="d-block d-md-inline mx-0 mx-md-5 mb-3 mb-md-0" style={{ textDecoration: "none" }}>
               Explore our products{" "}
               <i className="fa fa-long-arrow-right" aria-hidden="true"></i>
             </a>
-            <a href="#" className="d-block d-md-inline" style={{ textDecoration: "none" }}>
+            <a href="/" className="d-block d-md-inline" style={{ textDecoration: "none" }}>
               Try Kite demo{" "}
               <i className="fa fa-long-arrow-right" aria-hidden="true"></i>
             </a>

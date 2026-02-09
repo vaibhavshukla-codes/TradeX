@@ -133,7 +133,7 @@ function CreateTicket() {
                 {category.links.map((link, linkIndex) => (
                   <a
                     key={linkIndex}
-                    href="#"
+                    href="/"
                     style={{
                       color: "#666",
                       textDecoration: "none",

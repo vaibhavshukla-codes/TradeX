@@ -19,28 +19,28 @@ function Footer() {
           </div>
           <div className="col-6 col-md-6 col-lg-3 mb-4">
             <p className="fw-bold mb-3" style={{ fontSize: "14px" }}>Company</p>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>About</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Products</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Pricing</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Referral programme</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Careers</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Zerodha.tech</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Press & media</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Zerodha cares (CSR)</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>About</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Products</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Pricing</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Referral programme</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Careers</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Zerodha.tech</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Press & media</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Zerodha cares (CSR)</a>
           </div>
           <div className="col-6 col-md-6 col-lg-3 mb-4">
             <p className="fw-bold mb-3" style={{ fontSize: "14px" }}>Support</p>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Contact</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Support portal</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Z-Connect blog</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>List of charges</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Downloads & resources</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Contact</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Support portal</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Z-Connect blog</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>List of charges</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Downloads & resources</a>
           </div>
           <div className="col-12 col-md-6 col-lg-3 mb-4">
             <p className="fw-bold mb-3" style={{ fontSize: "14px" }}>Account</p>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Open an account</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Fund transfer</a>
-            <a href="#" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>60 day challenge</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Open an account</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>Fund transfer</a>
+            <a href="/" className="d-block mb-2" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>60 day challenge</a>
           </div>
         </div>
         <div className="mt-3 mt-md-5 text-muted pb-3" style={{ fontSize: "12px", lineHeight: "1.6", color: "#666" }}>
