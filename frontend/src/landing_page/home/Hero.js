@@ -8,7 +8,7 @@ function Hero() {
       <div className="row text-center">
         <img
           src={homeHero}
-          alt="Trading dashboard"
+          alt="Trading platform"
           className="mb-3 mb-md-5 img-fluid"
         />
         <h1 className="mt-3 mt-md-5 fs-2 fs-md-1">Invest in everything</h1>
