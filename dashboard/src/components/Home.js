@@ -14,6 +14,13 @@ const Home = () => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (!loading && !isAuthenticated && FRONTEND_URL) {
+      // Keep login on frontend only
+      window.location.replace(`${FRONTEND_URL}/login`);
+    }
+  }, [loading, isAuthenticated]);
+
   const bootstrapAuthFromQuery = () => {
     const params = new URLSearchParams(window.location.search);
     const tokenFromQuery = params.get('token');
@@ -83,14 +90,8 @@ const Home = () => {
 
   if (!isAuthenticated) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', padding: '24px', textAlign: 'center' }}>
-        <div>
-          <h2>Not authenticated</h2>
-          <p>Please login to continue.</p>
-          {FRONTEND_URL && (
-            <a href={`${FRONTEND_URL}/login`}>Go to Login</a>
-          )}
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <p>Redirecting to login...</p>
       </div>
     );
   }
