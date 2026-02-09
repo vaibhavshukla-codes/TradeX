@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { DASHBOARD_URL } from "../../config/api.config";
 
 function Signup() {
   const { signup } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -50,19 +50,8 @@ function Signup() {
       const result = await signup(trimmedData);
 
       if (result && result.success) {
-        if (result.data && result.data.token && result.data.user) {
-          const { token, user } = result.data;
-          const redirectUrl = new URL(DASHBOARD_URL);
-          redirectUrl.searchParams.set('token', token);
-          redirectUrl.searchParams.set(
-            'user',
-            encodeURIComponent(JSON.stringify(user))
-          );
-          window.location.href = redirectUrl.toString();
-          return;
-        }
-        // Fallback: redirect without params (dashboard will check localStorage)
-        window.location.href = DASHBOARD_URL;
+        // After signup, send user to login
+        navigate("/login", { replace: true });
       } else {
         setError(result?.message || "Signup failed. Please try again.");
         setLoading(false);
@@ -174,4 +163,3 @@ function Signup() {
 }
 
 export default Signup;
-
