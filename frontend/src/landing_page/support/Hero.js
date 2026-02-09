@@ -23,7 +23,7 @@ function Hero() {
           Support Portal
         </h4>
         <a 
-          href="#" 
+          href="/" 
           style={{ 
             color: "#387ed1",
             textDecoration: "none",
@@ -57,7 +57,7 @@ function Hero() {
           />
           <div className="d-flex flex-column flex-md-row gap-2 flex-wrap" style={{ marginTop: "20px" }}>
             <a 
-              href="#" 
+              href="/" 
               style={{ 
                 color: "#387ed1",
                 textDecoration: "none",
@@ -70,7 +70,7 @@ function Hero() {
               Track account opening
             </a>
             <a 
-              href="#" 
+              href="/" 
               style={{ 
                 color: "#387ed1",
                 textDecoration: "none",
@@ -83,7 +83,7 @@ function Hero() {
               Track segment activation
             </a>
             <a 
-              href="#" 
+              href="/" 
               style={{ 
                 color: "#387ed1",
                 textDecoration: "none",
@@ -96,7 +96,7 @@ function Hero() {
               Intraday margins
             </a>
             <a 
-              href="#"
+              href="/"
               style={{ 
                 color: "#387ed1",
                 textDecoration: "none",
@@ -121,7 +121,7 @@ function Hero() {
           <ol style={{ paddingLeft: "20px" }}>
             <li style={{ marginBottom: "12px" }}>
               <a 
-                href="#" 
+                href="/" 
                 style={{ 
                   color: "#387ed1",
                   textDecoration: "none"
@@ -134,7 +134,7 @@ function Hero() {
             </li>
             <li style={{ marginBottom: "12px" }}>
               <a 
-                href="#"
+                href="/"
                 style={{ 
                   color: "#387ed1",
                   textDecoration: "none"
