@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { redirectToDashboard } from "../../utils/dashboardRedirect";
 
 function Signup() {
   const { signup } = useAuth();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -50,8 +50,16 @@ function Signup() {
       const result = await signup(trimmedData);
 
       if (result && result.success) {
-        // After signup, send user to login
-        navigate("/login", { replace: true });
+        const redirected = redirectToDashboard({
+          token: result.data?.token || localStorage.getItem("token"),
+          user: result.data?.user,
+          onError: setError,
+        });
+
+        if (!redirected) {
+          setLoading(false);
+        }
+        return;
       } else {
         setError(result?.message || "Signup failed. Please try again.");
         setLoading(false);

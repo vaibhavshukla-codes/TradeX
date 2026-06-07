@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { DASHBOARD_URL } from "../config/api.config";
+import { redirectToDashboard } from "../utils/dashboardRedirect";
 
 function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -22,6 +22,15 @@ function Navbar() {
   const handleLogout = () => {
     isLoggingOut.current = true;
     logout();
+  };
+
+  const handleDashboardClick = (event) => {
+    event.preventDefault();
+    redirectToDashboard({
+      token: localStorage.getItem("token"),
+      user,
+      onError: console.error,
+    });
   };
 
   return (
@@ -92,7 +101,7 @@ function Navbar() {
                   <Link 
                     className="nav-link" 
                     to="/dashboard"
-                    onClick={() => window.location.href = DASHBOARD_URL}
+                    onClick={handleDashboardClick}
                   >
                     Dashboard
                   </Link>

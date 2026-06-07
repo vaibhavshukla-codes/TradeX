@@ -1,25 +1,12 @@
-import React, { useEffect, useState } from "react";
-import API from "../api/axios";
-import { FRONTEND_URL } from "../config/api.config";
+import React, { useEffect } from "react";
 
 import Dashboard from "./Dashboard";
 import TopBar from "./TopBar";
 
 const Home = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     bootstrapAuthFromQuery();
-    checkAuth();
   }, []);
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated && FRONTEND_URL) {
-      // Keep login on frontend only
-      window.location.replace(`${FRONTEND_URL}/login`);
-    }
-  }, [loading, isAuthenticated]);
 
   const bootstrapAuthFromQuery = () => {
     const params = new URLSearchParams(window.location.search);
@@ -46,55 +33,6 @@ const Home = () => {
       window.history.replaceState({}, '', newUrl);
     }
   };
-
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        if (FRONTEND_URL) {
-          window.location.href = `${FRONTEND_URL}/login`;
-        }
-        return;
-      }
-
-      const response = await API.get('/checkAuth');
-      if (response.data.authenticated) {
-        setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        if (FRONTEND_URL) {
-          window.location.href = `${FRONTEND_URL}/login`;
-        }
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      if (FRONTEND_URL) {
-        window.location.href = `${FRONTEND_URL}/login`;
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <p>Redirecting to login...</p>
-      </div>
-    );
-  }
 
   return (
     <>

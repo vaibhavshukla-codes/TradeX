@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { DASHBOARD_URL } from "../../config/api.config";
+import { redirectToDashboard } from "../../utils/dashboardRedirect";
 
 function Login() {
   const { login } = useAuth();
@@ -68,54 +68,11 @@ function Login() {
           }
         }
         
-        // Ensure we have token before redirecting
-        if (token) {
-          // Validate DASHBOARD_URL - prevent redirecting to login page
-          const currentUrl = window.location.origin + window.location.pathname;
-          const dashboardUrlLower = DASHBOARD_URL.toLowerCase();
-          const currentUrlLower = currentUrl.toLowerCase();
-          
-          // Check if DASHBOARD_URL is the same as current page or login page
-          if (dashboardUrlLower.includes('/login') || 
-              dashboardUrlLower === currentUrlLower ||
-              dashboardUrlLower.includes(currentUrlLower + '/login')) {
-            console.error('Invalid DASHBOARD_URL - cannot redirect to login page:', DASHBOARD_URL);
-            setError(`Dashboard URL is incorrectly configured. Current: ${DASHBOARD_URL}. Please set REACT_APP_DASHBOARD_URL to your dashboard deployment URL (not the login page).`);
-            setLoading(false);
-            return;
-          }
-          
-          try {
-            // Redirect to dashboard with token and user in URL params
-            const redirectUrl = new URL(DASHBOARD_URL);
-            redirectUrl.searchParams.set('token', token);
-            if (user) {
-              redirectUrl.searchParams.set(
-                'user',
-                encodeURIComponent(JSON.stringify(user))
-              );
-            }
-            // Force redirect immediately - don't set loading to false
-            console.log('Redirecting to dashboard:', redirectUrl.toString());
-            window.location.href = redirectUrl.toString();
-            return; // Don't execute code below
-          } catch (urlError) {
-            console.error('Error creating redirect URL:', urlError, 'DASHBOARD_URL:', DASHBOARD_URL);
-            // Check if DASHBOARD_URL is a valid URL
-            if (!DASHBOARD_URL.startsWith('http://') && !DASHBOARD_URL.startsWith('https://')) {
-              setError(`Invalid dashboard URL: ${DASHBOARD_URL}. Please set REACT_APP_DASHBOARD_URL to a valid URL (e.g., https://your-dashboard.vercel.app)`);
-              setLoading(false);
-              return;
-            }
-            // Fallback: redirect without params (dashboard will check localStorage)
-            window.location.href = DASHBOARD_URL;
-            return; // Don't execute code below
-          }
-        } else {
-          console.error('No token available after successful login');
-          setError("Login succeeded but token was not saved. Please try again.");
+        const redirected = redirectToDashboard({ token, user, onError: setError });
+        if (!redirected) {
           setLoading(false);
         }
+        return;
       } else {
         setError(result?.message || "Invalid username or password");
         setLoading(false);
@@ -208,4 +165,3 @@ function Login() {
 }
 
 export default Login;
-

@@ -43,6 +43,14 @@ const { UserModel } = require("./model/UserModel");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+const isDatabaseConnected = () => mongoose.connection.readyState === 1;
+
+const sendDatabaseUnavailable = (res) => {
+  return res.status(503).json({
+    message: "Database connection not available. Please check backend MongoDB configuration.",
+  });
+};
+
 // Middleware - CORS configuration (must be before bodyParser)
 // Supports both development and production via environment variables
 const corsOptions = {
@@ -156,6 +164,11 @@ const generateToken = (user) => {
 // Authentication Routes
 app.post("/signup", async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[Signup Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     const { email, username, password } = req.body;
     
     // Validate input
@@ -210,12 +223,6 @@ app.post("/signup", async (req, res) => {
       username: trimmedUsername,
       password: trimmedPassword, // Will be hashed by pre-save hook
     });
-
-    // Check if MongoDB is connected
-    if (mongoose.connection.readyState !== 1) {
-      console.error('[Signup Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
-      return res.status(503).json({ message: "Database connection not available. Please try again." });
-    }
 
     console.log('[Signup] Attempting to save user:', {
       username: trimmedUsername,
@@ -290,6 +297,11 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[Login Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     const { username, password } = req.body;
 
     // Validate input
@@ -350,6 +362,11 @@ app.post("/login", async (req, res) => {
 
 app.get("/checkAuth", authenticateToken, async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[CheckAuth Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     // If middleware passed, token is valid
     const user = await UserModel.findById(req.user.id).select('-password');
     
@@ -377,6 +394,11 @@ app.get("/checkAuth", authenticateToken, async (req, res) => {
 // Protected Routes - Trading Data
 app.get("/allHoldings", authenticateToken, async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[AllHoldings Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     const allHoldings = await HoldingsModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.json(allHoldings);
   } catch (error) {
@@ -387,6 +409,11 @@ app.get("/allHoldings", authenticateToken, async (req, res) => {
 
 app.get("/allPositions", authenticateToken, async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[AllPositions Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     const allPositions = await PositionsModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.json(allPositions);
   } catch (error) {
@@ -397,6 +424,11 @@ app.get("/allPositions", authenticateToken, async (req, res) => {
 
 app.get("/allOrders", authenticateToken, async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[AllOrders Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     const allOrders = await OrdersModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.json(allOrders);
   } catch (error) {
@@ -407,6 +439,11 @@ app.get("/allOrders", authenticateToken, async (req, res) => {
 
 app.post("/newOrder", authenticateToken, async (req, res) => {
   try {
+    if (!isDatabaseConnected()) {
+      console.error('[NewOrder Error] MongoDB not connected. ReadyState:', mongoose.connection.readyState);
+      return sendDatabaseUnavailable(res);
+    }
+
     const { name, qty, price, mode } = req.body;
 
     if (!name || qty === undefined || price === undefined || !mode) {

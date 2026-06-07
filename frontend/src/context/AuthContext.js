@@ -150,8 +150,10 @@ export const AuthProvider = ({ children }) => {
       const response = await API.post("/signup", trimmedData);
 
       if (response.data && response.data.token && response.data.user) {
-        // Signup should not automatically authenticate the user.
-        // Let login handle token storage and user state.
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        setUser(response.data.user);
+
         return {
           success: true,
           data: {

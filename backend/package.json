@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "mongo": "mkdir -p .mongodb-data && mongod --dbpath .mongodb-data --bind_ip 127.0.0.1 --port 27017 --nounixsocket",
     "seed": "node seedData.js"
   },
   "devDependencies": {
